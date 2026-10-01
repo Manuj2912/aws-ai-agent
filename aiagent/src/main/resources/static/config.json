@@ -1,0 +1,6 @@
+{
+  "userPoolId": "us-east-1_LfqxLucen",
+  "clientId": "4g23r381101n2gfefdptkvdiao",
+  "apiEndpoint": "https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-agentcore%3Aus-east-1%3A962746888785%3Aruntime%2Faiagent-3lLbqlEG74/invocations?qualifier=DEFAULT",
+  "enableAttachments": true
+}

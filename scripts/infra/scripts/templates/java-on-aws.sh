@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# Java-on-AWS workshop post-deploy script
+# Base development tools are already installed by ide/tools.sh during bootstrap
+# This script sets up workshop-specific infrastructure (EKS, monitoring, analysis)
+
+# Source common utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../lib/common.sh"
+
+log_info "Starting Java-on-AWS workshop post-deploy setup..."
+
+# Phase 1: EKS cluster configuration
+log_info "Phase 1: Configuring EKS cluster..."
+if bash "$SCRIPT_DIR/../setup/eks.sh"; then
+    log_success "EKS cluster configuration completed"
+else
+    log_error "EKS cluster configuration failed"
+    exit 1
+fi
+
+# Phase 2: Monitoring stack (Prometheus + Grafana)
+log_info "Phase 2: Setting up monitoring stack..."
+if bash "$SCRIPT_DIR/../setup/monitoring.sh"; then
+    log_success "Monitoring stack setup completed"
+else
+    log_error "Monitoring stack setup failed"
+    exit 1
+fi
+
+# Phase 3: Analysis (Thread dump + Profiling)
+log_info "Phase 3: Setting up analysis (thread dump + profiling)..."
+if bash "$SCRIPT_DIR/../setup/analysis.sh"; then
+    log_success "Analysis setup completed"
+else
+    log_error "Analysis setup failed"
+    exit 1
+fi
+
+# Phase 4: Agentic performance platform (Pyroscope + analyzer + collector wiring)
+log_info "Phase 4: Setting up agentic performance platform..."
+if bash "$SCRIPT_DIR/../setup/perf-platform.sh"; then
+    log_success "Agentic performance platform setup completed"
+else
+    log_error "Agentic performance platform setup failed"
+    exit 1
+fi
+
+# Phase 5: Unicorn Store Spring (build and push to ECR)
+log_info "Phase 5: Building and pushing Unicorn Store Spring..."
+if bash "$SCRIPT_DIR/../setup/unicorn-store-spring.sh"; then
+    log_success "Unicorn Store Spring setup completed"
+else
+    log_error "Unicorn Store Spring setup failed"
+    exit 1
+fi
+
+# Phase 6: Simplify p10k prompt (remove vcs, kubecontext, aws)
+log_info "Phase 6: Simplifying p10k prompt..."
+P10K_FILE="$HOME/.p10k.zsh"
+if [[ -f "$P10K_FILE" ]]; then
+    # Remove vcs from left prompt
+    sed -i "s/POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir vcs newline prompt_char)/POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir newline prompt_char)/" "$P10K_FILE"
+    # Remove kubecontext and aws from right prompt
+    sed -i "s/POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs kubecontext aws newline)/POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs newline)/" "$P10K_FILE"
+    log_success "p10k prompt simplified"
+else
+    log_warning "p10k.zsh not found, skipping prompt customization"
+fi
+
+log_success "Java-on-AWS workshop post-deploy setup completed successfully!"
+
+# Emit for bootstrap summary
+echo "✅ Success: Java-on-AWS workshop template"

@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: ai-agent
+  ai:
+    bedrock:
+      converse:
+        chat:
+          enabled: true
+          options:
+            model: amazon.nova-pro-v1:0
+      titan:
+        embedding:
+          model: amazon.titan-embed-text-v2:0
+          input-type: text
+    model:
+      embedding: bedrock-titan
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        dimensions: 1024
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ai-agent-db
+    username: chatuser
+    password: chatpass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.yaml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+
+#  tracing:
+#    sampling:
+#      probability: 1.0
+#
+#  zipkin:
+#    tracing:
+#      endpoint: http://tempo:9411/api/v2/spans
+
+  metrics:
+    distribution:
+      percentiles-histogram:
+        spring:
+          ai:
+            chat:
+              client: true
+        gen_ai:
+          client:
+            operation: true
+        db:
+          vector:
+            client:
+              operation: true
+        http:
+          server:
+            requests: true

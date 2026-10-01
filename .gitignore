@@ -1,1 +1,28 @@
 .DS_Store
+
+# macOS
+.DS_Store
+
+# Java / Maven
+target/
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+
+# Build output
+build/
+out/
+
+# Node
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
